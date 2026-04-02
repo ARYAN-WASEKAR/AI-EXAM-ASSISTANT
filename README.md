@@ -52,5 +52,19 @@ AI Exam Assistant helps students understand concepts and prepare exam-ready answ
 ## 💡 Unique Feature
 This project not only generates answers but also evaluates student responses and provides feedback with score and suggestions.
 
+## 🧪 Example Output
+
+--- FEEDBACK ---
+star : outoff 5
+Correct Points: Basic idea correct  
+Missing Points: Explanation missing  
+Suggestions: Add more detail  
+Final Verdict: Needs Improvement
+
+## 🎥 Demo Video
+
+[Watch Demo](https://youtu.be/dTRTjXnTAqQ)
+This demo shows how the system generates answers and evaluates student responses.
+
 ## 👨‍💻 Author
 Aryan Wasekar

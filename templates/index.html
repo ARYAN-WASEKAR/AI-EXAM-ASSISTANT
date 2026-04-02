@@ -16,6 +16,7 @@
             <div class="logo">🎓</div>
             <h1>AI Exam Assistant</h1>
             <p class="subtitle">Ask any exam question and get a complete structured answer</p>
+            <a href="/feedback-view" class="dashboard-link">📊 View Feedback Dashboard</a>
         </header>
 
         <div class="input-section">
@@ -250,14 +251,26 @@
             });
         });
 
-        function submitFeedback() {
+        async function submitFeedback() {
             if (selectedRating === 0) {
                 alert('Please select a star rating before submitting.');
                 return;
             }
+            const comment = document.getElementById('feedbackText').value.trim();
+            const question = document.getElementById('questionDisplay').textContent.replace('❓ ', '').trim();
+
+            try {
+                await fetch('/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rating: selectedRating, comment, question })
+                });
+            } catch (e) {}
+
             document.getElementById('feedbackThanks').classList.remove('hidden');
-            document.querySelector('.feedback-btn').disabled = true;
-            document.querySelector('.feedback-btn').style.opacity = '0.5';
+            const btn = document.querySelector('.feedback-btn');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
         }
 
         function setLoading(loading) {

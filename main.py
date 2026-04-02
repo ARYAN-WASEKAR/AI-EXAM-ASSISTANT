@@ -1,10 +1,26 @@
 import os
+import json
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from google import genai
 
 app = Flask(__name__)
 
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
+FEEDBACK_FILE = "feedback.json"
+
+def load_feedback():
+    if not os.path.exists(FEEDBACK_FILE):
+        return []
+    with open(FEEDBACK_FILE, "r") as f:
+        return json.load(f)
+
+def save_feedback(entry):
+    data = load_feedback()
+    data.append(entry)
+    with open(FEEDBACK_FILE, "w") as f:
+        json.dump(data, f, indent=2)
 
 @app.route("/")
 def index():
@@ -43,6 +59,32 @@ Format each section with its heading clearly labeled.
         if "API_KEY" in err or "401" in err or "403" in err:
             return jsonify({"error": "Invalid or unauthorized API key. Please check your GEMINI_API_KEY."}), 401
         return jsonify({"error": "Something went wrong. Please try again."}), 500
+
+@app.route("/feedback", methods=["POST"])
+def submit_feedback():
+    data = request.get_json()
+    rating = data.get("rating")
+    comment = data.get("comment", "").strip()
+    question = data.get("question", "").strip()
+
+    if not rating or not isinstance(rating, int) or rating < 1 or rating > 5:
+        return jsonify({"error": "Invalid rating."}), 400
+
+    entry = {
+        "rating": rating,
+        "comment": comment,
+        "question": question,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    save_feedback(entry)
+    return jsonify({"success": True})
+
+@app.route("/feedback-view")
+def view_feedback():
+    entries = load_feedback()
+    entries_sorted = sorted(entries, key=lambda x: x["timestamp"], reverse=True)
+    avg = round(sum(e["rating"] for e in entries_sorted) / len(entries_sorted), 1) if entries_sorted else 0
+    return render_template("feedback.html", entries=entries_sorted, total=len(entries_sorted), avg=avg)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)

@@ -41,6 +41,9 @@
             </div>
             <div id="questionDisplay" class="question-display"></div>
             <div id="answerCards" class="answer-cards"></div>
+            <div id="examBadge" class="exam-badge hidden">
+                ✅ Recommended for exam preparation.
+            </div>
         </div>
     </div>
 
@@ -192,12 +195,14 @@
                 cardsContainer.innerHTML = `<div class="raw-answer">${formatContent(answerText)}</div>`;
             }
 
+            document.getElementById('examBadge').classList.remove('hidden');
             document.getElementById('resultSection').classList.remove('hidden');
             document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         function clearResult() {
             hideResult();
+            document.getElementById('examBadge').classList.add('hidden');
             document.getElementById('questionInput').value = '';
         }
 

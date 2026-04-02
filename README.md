@@ -38,11 +38,6 @@ AI Exam Assistant helps students understand concepts and prepare exam-ready answ
 
 ---
 
-## 📸 Demo
-(Add screenshots here)
-
----
-
 ## 🎯 Future Scope
 - Voice input
 - Web app UI

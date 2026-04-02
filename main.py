@@ -34,10 +34,15 @@ Format each section with its heading clearly labeled.
 """
 
     try:
-        response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=prompt)
+        response = client.models.generate_content(model="gemini-flash-lite-latest", contents=prompt)
         return jsonify({"answer": response.text})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        err = str(e)
+        if "429" in err or "RESOURCE_EXHAUSTED" in err:
+            return jsonify({"error": "API quota limit reached. Please wait a moment and try again, or enable billing on your Google AI account at https://ai.dev"}), 429
+        if "API_KEY" in err or "401" in err or "403" in err:
+            return jsonify({"error": "Invalid or unauthorized API key. Please check your GEMINI_API_KEY."}), 401
+        return jsonify({"error": "Something went wrong. Please try again."}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)

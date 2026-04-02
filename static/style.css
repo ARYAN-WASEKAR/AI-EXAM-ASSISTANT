@@ -170,15 +170,11 @@ button#askBtn:disabled {
 
 .answer-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 18px;
 }
 
 @media (max-width: 600px) {
-    .answer-cards {
-        grid-template-columns: 1fr;
-    }
-
     header h1 {
         font-size: 1.8rem;
     }
@@ -190,41 +186,46 @@ button#askBtn:disabled {
     border: 2px solid #e2e8f0;
     transition: transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
 }
 
 .answer-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
 .card-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    font-weight: 600;
-    font-size: 0.95rem;
+    gap: 12px;
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 1rem;
 }
 
 .card-icon {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
 .card-header h3 {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
 }
 
 .card-body {
-    padding: 14px 16px;
-    font-size: 0.92rem;
-    color: #4a5568;
-    line-height: 1.75;
+    padding: 18px 22px;
+    font-size: 0.95rem;
+    color: #374151;
+    line-height: 1.85;
     background: white;
+    flex: 1;
+    text-align: justify;
 }
 
 .card-body p {
-    margin: 0 0 8px 0;
+    margin: 0 0 10px 0;
 }
 
 .card-body p:last-child {
@@ -233,14 +234,14 @@ button#askBtn:disabled {
 
 .card-body ul,
 .card-body ol {
-    padding-left: 20px;
-    margin: 4px 0 8px 0;
+    padding-left: 22px;
+    margin: 6px 0 10px 0;
 }
 
 .card-body li {
-    margin-bottom: 5px;
+    margin-bottom: 7px;
     padding-left: 4px;
-    line-height: 1.6;
+    line-height: 1.75;
 }
 
 .card-body li:last-child {
@@ -248,13 +249,24 @@ button#askBtn:disabled {
 }
 
 .card-body strong {
-    color: #2d3748;
-    font-weight: 600;
+    color: #1a202c;
+    font-weight: 700;
 }
 
 .card-body em {
     color: #553c9a;
     font-style: italic;
+}
+
+mark.kw {
+    background: linear-gradient(120deg, #fef08a 0%, #fde68a 100%);
+    color: #78350f;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 5px;
+    box-shadow: 0 1px 3px rgba(251,191,36,0.3);
+    text-decoration: none;
+    font-style: normal;
 }
 
 .raw-answer {

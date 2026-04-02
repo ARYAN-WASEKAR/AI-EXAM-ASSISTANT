@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Exam Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🎓</div>
+            <h1>AI Exam Assistant</h1>
+            <p class="subtitle">Ask any exam question and get a complete structured answer</p>
+        </header>
+
+        <div class="input-section">
+            <div class="input-wrapper">
+                <textarea
+                    id="questionInput"
+                    placeholder="Enter your exam question here... e.g., What is photosynthesis? or Explain the water cycle."
+                    rows="4"
+                ></textarea>
+                <button id="askBtn" onclick="askQuestion()">
+                    <span id="btnText">Get Answer</span>
+                    <span id="btnLoader" class="hidden">⏳ Generating...</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="errorBox" class="error-box hidden"></div>
+
+        <div id="resultSection" class="result-section hidden">
+            <div class="result-header">
+                <h2>📋 Your Answer</h2>
+                <button class="clear-btn" onclick="clearResult()">✕ Clear</button>
+            </div>
+            <div id="questionDisplay" class="question-display"></div>
+            <div id="answerCards" class="answer-cards"></div>
+        </div>
+    </div>
+
+    <script>
+        const sectionConfig = [
+            { key: "Simple Explanation", icon: "💡", color: "blue" },
+            { key: "Bullet Points", icon: "📌", color: "green" },
+            { key: "2-Mark Answer", icon: "✏️", color: "orange" },
+            { key: "5-Mark Answer", icon: "📝", color: "purple" },
+            { key: "Keywords", icon: "🔑", color: "red" },
+            { key: "Hindi Translation", icon: "🇮🇳", color: "teal" },
+        ];
+
+        function parseAnswer(text) {
+            const sections = {};
+            const lines = text.split('\n');
+            let currentSection = null;
+            let currentContent = [];
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                let matched = false;
+
+                for (const config of sectionConfig) {
+                    const patterns = [
+                        new RegExp(`^\\*?\\*?\\d+\\.?\\s*\\*?\\*?${config.key}\\*?\\*?`, 'i'),
+                        new RegExp(`^\\*?\\*?${config.key}\\*?\\*?\\s*:?\\s*$`, 'i'),
+                        new RegExp(`^#+\\s*${config.key}`, 'i'),
+                    ];
+                    for (const pattern of patterns) {
+                        if (pattern.test(trimmed)) {
+                            if (currentSection) {
+                                sections[currentSection] = currentContent.join('\n').trim();
+                            }
+                            currentSection = config.key;
+                            currentContent = [];
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if (matched) break;
+                }
+
+                if (!matched && currentSection) {
+                    currentContent.push(line);
+                }
+            }
+
+            if (currentSection) {
+                sections[currentSection] = currentContent.join('\n').trim();
+            }
+
+            return sections;
+        }
+
+        function formatContent(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/^[-•]\s+(.+)/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+        }
+
+        async function askQuestion() {
+            const question = document.getElementById('questionInput').value.trim();
+            if (!question) {
+                showError("Please enter a question before submitting.");
+                return;
+            }
+
+            setLoading(true);
+            hideError();
+            hideResult();
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    displayResult(question, data.answer);
+                }
+            } catch (err) {
+                showError("Something went wrong. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function displayResult(question, answerText) {
+            document.getElementById('questionDisplay').textContent = '❓ ' + question;
+
+            const sections = parseAnswer(answerText);
+            const cardsContainer = document.getElementById('answerCards');
+            cardsContainer.innerHTML = '';
+
+            for (const config of sectionConfig) {
+                const content = sections[config.key];
+                if (!content) continue;
+
+                const card = document.createElement('div');
+                card.className = `answer-card color-${config.color}`;
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-icon">${config.icon}</span>
+                        <h3>${config.key}</h3>
+                    </div>
+                    <div class="card-body">${formatContent(content)}</div>
+                `;
+                cardsContainer.appendChild(card);
+            }
+
+            if (cardsContainer.children.length === 0) {
+                cardsContainer.innerHTML = `<div class="raw-answer">${formatContent(answerText)}</div>`;
+            }
+
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearResult() {
+            hideResult();
+            document.getElementById('questionInput').value = '';
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('askBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            btn.disabled = loading;
+            btnText.classList.toggle('hidden', loading);
+            btnLoader.classList.toggle('hidden', !loading);
+        }
+
+        function showError(msg) {
+            const box = document.getElementById('errorBox');
+            box.textContent = '⚠️ ' + msg;
+            box.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorBox').classList.add('hidden');
+        }
+
+        function hideResult() {
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        document.getElementById('questionInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                askQuestion();
+            }
+        });
+    </script>
+</body>
+</html>

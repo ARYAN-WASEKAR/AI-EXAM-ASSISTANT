@@ -93,13 +93,43 @@
         }
 
         function formatContent(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/^[-•]\s+(.+)/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>');
+            const lines = text.split('\n');
+            let html = '';
+            let inList = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i]
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                const isBullet = /^[-•*]\s+/.test(line);
+                const isNumbered = /^\d+\.\s+/.test(line);
+                const isEmpty = line.trim() === '';
+
+                if (isBullet) {
+                    if (!inList) { html += '<ul>'; inList = true; }
+                    html += `<li>${line.replace(/^[-•*]\s+/, '')}</li>`;
+                } else if (isNumbered) {
+                    if (!inList) { html += '<ol>'; inList = 'ol'; }
+                    html += `<li>${line.replace(/^\d+\.\s+/, '')}</li>`;
+                } else {
+                    if (inList) {
+                        html += inList === 'ol' ? '</ol>' : '</ul>';
+                        inList = false;
+                    }
+                    if (isEmpty) {
+                        html += '';
+                    } else {
+                        html += `<p>${line}</p>`;
+                    }
+                }
+            }
+
+            if (inList) {
+                html += inList === 'ol' ? '</ol>' : '</ul>';
+            }
+
+            return html;
         }
 
         async function askQuestion() {

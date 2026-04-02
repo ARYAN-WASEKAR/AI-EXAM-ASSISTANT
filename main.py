@@ -34,7 +34,7 @@ Format each section with its heading clearly labeled.
 """
 
     try:
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=prompt)
         return jsonify({"answer": response.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

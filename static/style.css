@@ -250,23 +250,13 @@ button#askBtn:disabled {
 
 .card-body strong {
     color: #1a202c;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.01em;
 }
 
 .card-body em {
     color: #553c9a;
     font-style: italic;
-}
-
-mark.kw {
-    background: linear-gradient(120deg, #fef08a 0%, #fde68a 100%);
-    color: #78350f;
-    font-weight: 700;
-    border-radius: 4px;
-    padding: 1px 5px;
-    box-shadow: 0 1px 3px rgba(251,191,36,0.3);
-    text-decoration: none;
-    font-style: normal;
 }
 
 .raw-answer {

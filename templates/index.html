@@ -44,6 +44,20 @@
             <div id="examBadge" class="exam-badge hidden">
                 ✅ Recommended for exam preparation.
             </div>
+
+            <div id="feedbackSection" class="feedback-section hidden">
+                <h3 class="feedback-title">💬 Was this answer helpful?</h3>
+                <div class="star-row" id="starRow">
+                    <span class="star" data-val="1">★</span>
+                    <span class="star" data-val="2">★</span>
+                    <span class="star" data-val="3">★</span>
+                    <span class="star" data-val="4">★</span>
+                    <span class="star" data-val="5">★</span>
+                </div>
+                <textarea id="feedbackText" class="feedback-input" placeholder="Share your thoughts or suggestions (optional)..." rows="3"></textarea>
+                <button class="feedback-btn" onclick="submitFeedback()">Submit Feedback</button>
+                <div id="feedbackThanks" class="feedback-thanks hidden">🎉 Thank you for your feedback!</div>
+            </div>
         </div>
     </div>
 
@@ -196,6 +210,8 @@
             }
 
             document.getElementById('examBadge').classList.remove('hidden');
+            resetFeedback();
+            document.getElementById('feedbackSection').classList.remove('hidden');
             document.getElementById('resultSection').classList.remove('hidden');
             document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
         }
@@ -203,7 +219,45 @@
         function clearResult() {
             hideResult();
             document.getElementById('examBadge').classList.add('hidden');
+            document.getElementById('feedbackSection').classList.add('hidden');
             document.getElementById('questionInput').value = '';
+        }
+
+        let selectedRating = 0;
+
+        function resetFeedback() {
+            selectedRating = 0;
+            document.getElementById('feedbackText').value = '';
+            document.getElementById('feedbackThanks').classList.add('hidden');
+            document.querySelectorAll('.star').forEach(s => s.classList.remove('active', 'hovered'));
+        }
+
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('mouseover', function () {
+                const val = +this.dataset.val;
+                document.querySelectorAll('.star').forEach(s => {
+                    s.classList.toggle('hovered', +s.dataset.val <= val);
+                });
+            });
+            star.addEventListener('mouseout', function () {
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('hovered'));
+            });
+            star.addEventListener('click', function () {
+                selectedRating = +this.dataset.val;
+                document.querySelectorAll('.star').forEach(s => {
+                    s.classList.toggle('active', +s.dataset.val <= selectedRating);
+                });
+            });
+        });
+
+        function submitFeedback() {
+            if (selectedRating === 0) {
+                alert('Please select a star rating before submitting.');
+                return;
+            }
+            document.getElementById('feedbackThanks').classList.remove('hidden');
+            document.querySelector('.feedback-btn').disabled = true;
+            document.querySelector('.feedback-btn').style.opacity = '0.5';
         }
 
         function setLoading(loading) {

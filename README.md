@@ -49,6 +49,8 @@ AI Exam Assistant helps students understand concepts and prepare exam-ready answ
 - Multi-language support
 
 ---
+## 💡 Unique Feature
+This project not only generates answers but also evaluates student responses and provides feedback with score and suggestions.
 
 ## 👨‍💻 Author
 Aryan Wasekar
